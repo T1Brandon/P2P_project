@@ -85,6 +85,7 @@ you can change it to socket.hostname instead like before.
 inputs = []
 outputs = []
 exp = []
+regFiles = []
 ss = socket.socket() # this is a TCP connection
 serverPort = int(input('Please enter listening port number for the download server:'))
 try:
@@ -142,17 +143,20 @@ while True:
         conf_pdu = pickle.loads(b_recv_PDU)
 
         if conf_pdu.data_type == 'A':
-            print('successfully removed from the list')
+            print('successfully Added to the list')
+            regFiles.append(filename)
 
         elif conf_pdu.data_type == 'E':
-            print(conf_pdu.data)
             while conf_pdu.data_type == 'E': # a used may need to retry multiple times to register a username on server!
+                print(conf_pdu.data)
                 # ask user to change username
                 username = select_name()
-                filename = input('Please input file name to be registered: ')
                 r_PDU = PDU('R', {'peer_name': username, 'file_name': filename, 'IPaddress': host, 'portnumber': serverPort})
                 b_r_PDU = pickle.dumps(r_PDU)
                 ss.send(b_r_PDU)
+
+            print('successfully Added to the list')
+            regFiles.append(filename)
                 # send 'R' pdu
                     # receive response
                     # extract data_type
@@ -170,7 +174,7 @@ while True:
 
     if command == 'Q':
         # for all the registered files:
-        for all file_names:
+        for filename in regFiles:
             de_register(username, filename)
         # quit the program
         s.close()
