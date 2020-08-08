@@ -13,6 +13,8 @@ It provides the following functions:
 import socket                   # Import socket module
 from collections import namedtuple
 import select
+import pickle
+import os
 
 s = socket.socket(socket.SOCK_DGRAM)             # Create a socket object
 host = socket.gethostname()     # Get local machine name
@@ -127,6 +129,7 @@ while True:
 
     if command == 'L':
         # list local files
+        print(os.listdir('.'))
 
     if command == 'R':
         filename = input('Please input file name to be registered: ')
