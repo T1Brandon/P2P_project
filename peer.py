@@ -31,7 +31,7 @@ def select_name():
 
 def de_register(s,username, filename):
     t_pdu = PDU('T',{'peer_name':username,'file_name':filename})
-    b_t_pdu = pickle.dumps(t.pdu)
+    b_t_pdu = pickle.dumps(t_pdu)
     s.send(b_t_pdu)
     b_conf_pdu = s.recv
     conf_pdu = pickle.loads(b_conf_pdu)
@@ -54,11 +54,11 @@ def download_file(file_name, address, destination):
     ds.send(b_pdu)
     # send pdu to peer address (destination)
     r_b_pdu = ds.recv()
-    r_pdu = pickle.loads(r_b_type)
+    r_pdu = pickle.loads(r_b_pdu)
     data_type = r_pdu.data_type
     if data_type == 'E':
         print('File does not exist anymore')
-    elif data_type = 'C':
+    elif data_type == 'C':
         with open(destination+filename) as f:
             f.write(r_pdu.data)
     # receive the data
@@ -146,7 +146,7 @@ while True:
 
         elif conf_pdu.data_type == 'E':
             print(conf_pdu.data)
-            while pdu.data_type == 'E': # a used may need to retry multiple times to register a username on server!
+            while conf_pdu.data_type == 'E': # a used may need to retry multiple times to register a username on server!
                 # ask user to change username
                 username = select_name()
                 filename = input('Please input file name to be registered: ')
