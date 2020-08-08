@@ -129,18 +129,37 @@ while True:
         # list local files
 
     if command == 'R':
+        filename = input('Please input file name to be registered: ')
+
+        r_PDU = PDU('R',{'peer_name':username,'file_name':filename, 'IPaddress': host, 'portnumber':serverPort})
+        b_r_PDU = pickle.dumps(r_PDU)
+        ss.send(b_r_PDU)
+
+        b_recv_PDU = ss.recv()
+        conf_pdu = pickle.loads(b_recv_PDU)
+
+        if conf_pdu.data_type == 'A':
+            print('successfully removed from the list')
+
+        elif conf_pdu.data_type == 'E':
+            print(conf_pdu.data)
+            while pdu.data_type == 'E': # a used may need to retry multiple times to register a username on server!
+                # ask user to change username
+                username = select_name()
+                filename = input('Please input file name to be registered: ')
+                r_PDU = PDU('R', {'peer_name': username, 'file_name': filename, 'IPaddress': host, 'portnumber': serverPort})
+                b_r_PDU = pickle.dumps(r_PDU)
+                ss.send(b_r_PDU)
+                # send 'R' pdu
+                    # receive response
+                    # extract data_type
+
         # get the file name
         # create 'R' pdu using username, filename, IPaddress and portnumber
         # send 'R' pdu
         # receive response pdu
         # if 'A', done
         # else if 'E',
-            while pdu.data_type == 'E': # a used may need to retry multiple times to register a username on server!
-                # ask user to change username
-                username = select_name()
-                # send 'R' pdu
-                    # receive response
-                    # extract data_type
 
     if command == 'T':
         # get the file name from user
