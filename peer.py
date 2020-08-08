@@ -21,7 +21,7 @@ port = 60000                    # Reserve a port for your service.
 s.connect((host, port))
 # client is connected to the server
 # define the PDU
-PDU = namedtuple('UDP', ['data_type', 'data'])
+PDU = namedtuple('PDU', ['data_type', 'data'])
 
 ################## Functions
 def select_name():
@@ -33,7 +33,6 @@ def de_register(s,username, filename):
     s.send(b_t_pdu)
     b_conf_pdu = s.recv
     conf_pdu = pickle.loads(b_conf_pdu)
-    return b_t_pdu
 
     if conf_pdu.data_type == 'A':
         print('successfully removed from the list')
@@ -94,6 +93,7 @@ ss.listen(5)
 inputs.append(ss)
 exp.append(ss)
 
+timeout = 1 # timout for the select function, it's 1 second now, you can have fraction of a second using float number, example: timeout = 0.3
 # service loop
 while True:
     readable, writable, exceptional = select.select(inputs, outputs, exp)
@@ -105,53 +105,51 @@ while True:
             # send the file using 'C' type
             # if file doest not exist send 'E' pdu
 
-    else: # there is no incoming connection request, so go to the menu and ask the user for command
+    command = str(input('Please choose from the list below:\n'
+                         '[O] Get online list\n'
+                         '[L] List local files\n'
+                         '[R] Register a file\n'
+                         '[T] De-register a file\n'
+                         '[Q] Quit the program\n'))
 
-        command = str(input('Please choose from the list below:\n'
-                             '[O] Get online list\n'
-                             '[L] List local files\n'
-                             '[R] Register a file\n'
-                             '[T] De-register a file\n'
-                             '[Q] Quit the program\n'))
+    if command == 'O':
+        # send 'O' type pdu
+        # receive the list
+        # print the list
+        # ask user for the target file
+        # create 'S' type pdu
+        # send 'S' pdu to the index server
+        # receive 'S' pdu in response
+        # extract address
+        # establish new connection to the peer
+        destination = './'
+        download_file(file_name, address, destination)
 
-        if command == 'O':
-            # send 'O' type pdu
-            # receive the list
-            # print the list
-            # ask user for the target file
-            # create 'S' type pdu
-            # send 'S' pdu to the index server
-            # receive 'S' pdu in response
-            # extract address
-            # establish new connection to the peer
-            destination = './'
-            download_file(file_name, address, destination)
+    if command == 'L':
+        # list local files
 
-        if command == 'L':
-            # list local files
-
-        if command == 'R':
-            # get the file name
-            # create 'R' pdu using username, filename, IPaddress and portnumber
-            # send 'R' pdu
-            # receive response pdu
-            # if 'A', done
-            # else if 'E',
-                while pdu.data_type == 'E': # a used may need to retry multiple times to register a username on server!
-                    # ask user to change username
-                    username = select_name()
-                    # send 'R' pdu
+    if command == 'R':
+        # get the file name
+        # create 'R' pdu using username, filename, IPaddress and portnumber
+        # send 'R' pdu
+        # receive response pdu
+        # if 'A', done
+        # else if 'E',
+            while pdu.data_type == 'E': # a used may need to retry multiple times to register a username on server!
+                # ask user to change username
+                username = select_name()
+                # send 'R' pdu
                     # receive response
                     # extract data_type
 
-        if command == 'T':
-            # get the file name from user
-            de_register(username, filename)
+    if command == 'T':
+        # get the file name from user
+        de_register(username, filename)
 
-        if command == 'Q':
-            # for all the registered files:
-            for all file_names:
-                de_register(username, filename)
-            # quit the program
-            s.close()
+    if command == 'Q':
+        # for all the registered files:
+        for all file_names:
+            de_register(username, filename)
+        # quit the program
+        s.close()
 
