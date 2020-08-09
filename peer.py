@@ -102,7 +102,7 @@ ss.listen(5)
 inputs.append(ss)
 exp.append(ss)
 
-timeout = 1   # timeout for the select function, it's 1 second now, you can have fraction of a second using float
+timeout = 1  # timeout for the select function, it's 1 second now, you can have fraction of a second using float
 # number, example: timeout = 0.3
 # service loop
 while True:
@@ -123,7 +123,7 @@ while True:
                 b_c_pdu = pickle.dumps(e_pdu)  # turns pdu into bytes
                 s.send(b_c_pdu)  # send the pdu
                 break
-            else: # if file doest not exist send 'E' pdu
+            else:  # if file doest not exist send 'E' pdu
                 e_pdu = PDU('E', {'msg': 'File does not exist'})  # creates E pdu
                 b_e_pdu = pickle.dumps(e_pdu)  # turns pdu into bytes
                 s.send(b_e_pdu)  # send the pdu
@@ -145,8 +145,8 @@ while True:
         reply = pickle.loads(reply_pdu)
         print(*reply.data, sep='\n')
 
-        file_name = input('Please type the desired filename')
-        peer = input("Please input the peer's name")
+        file_name = input('Please input the desired filename: ')
+        peer = input("Please input the peer's name: ")
         # Send S type PDU to establish peer to peer connection
         s_pdu = PDU(data_type='S', data={'peer_name': peer, 'file_name': file_name})
         b_s_pdu = pickle.dumps(s_pdu)
@@ -167,7 +167,7 @@ while True:
         filename = input('Please input file name to be registered: ')
         # Create R type PDU to register to the index server and send it
         r_PDU = PDU(data_type='R',
-                    data={'peer_name': username, 'file_name': filename, 'IPaddress': host, 'portnumber': serverPort})
+                    data={'peer_name': username, 'file_name': filename, 'address': (host, serverPort)})
         b_r_PDU = pickle.dumps(r_PDU)
         s.send(b_r_PDU)
 
@@ -211,4 +211,4 @@ while True:
         for fname in regFiles:
             de_register(s, username, fname)
         # quit the program
-        s.close()
+        # s.close()
