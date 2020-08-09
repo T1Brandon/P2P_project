@@ -115,6 +115,6 @@ while True:
 
     # else ....
 
-    print('Done sending')
-    conn.send(b'Thank you for connecting')
-    conn.close() # close the connection
+print('Done sending')
+conn.send(b'Thank you for connecting')
+conn.close() # close the connection
