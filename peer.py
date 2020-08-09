@@ -26,18 +26,19 @@ s.connect((host, port))
 PDU = namedtuple('PDU', ['data_type', 'data'])
 
 ################## Functions
-def select_name():
+def select_name(): # function for registering a username
     return input('Please enter preferred username:')
 
-def de_register(s,username, filename):
-    t_pdu = PDU('T',{'peer_name':username,'file_name':filename})
+def de_register(s,username, filename): # function to deregister a file from the index server
+    t_pdu = PDU('T',{'peer_name':username,'file_name':filename}) # create T type PDU conver it to binary and send to index server
     b_t_pdu = pickle.dumps(t_pdu)
     s.send(b_t_pdu)
-    b_conf_pdu = s.recv
+    b_conf_pdu = s.recv # Recieve reply PDU and parse it
     conf_pdu = pickle.loads(b_conf_pdu)
 
     if conf_pdu.data_type == 'A':
         print('successfully removed from the list')
+
 
     elif conf_pdu.data_type == 'E':
         print(conf_pdu.data)
