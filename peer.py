@@ -111,9 +111,22 @@ while True:
         if sock is ss:
             fileReq_Socket, fileReq_addr = ss.accept()  # accept connection
             ss.recv()  # receive the request
-            # check the file name (it should be 'D' type)
-            # send the file using 'C' type
-            # if file doest not exist send 'E' pdu
+            data = s.recv(100)
+            new = pickle.loads(data)  # change it to namedtuple
+            type = new.data_type  # extract data_type
+            print(type)
+            data = new.data  # extract data
+            print(data)
+            if type == 'D':  # check the file name (it should be 'D' type)
+                c_pdu = PDU('C', {'msg': 'File does not exist'})  # creates E pdu
+                b_c_pdu = pickle.dumps(e_pdu)  # turns pdu into bytes
+                s.send(b_c_pdu)  # send the pdu
+                break
+            else: # if file doest not exist send 'E' pdu
+                e_pdu = PDU('E', {'msg': 'File does not exist'})  # creates E pdu
+                b_e_pdu = pickle.dumps(e_pdu)  # turns pdu into bytes
+                s.send(b_e_pdu)  # send the pdu
+                break
 
     command = str(input('Please choose from the list below:\n'
                         '[O] Get online list\n'
