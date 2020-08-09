@@ -18,7 +18,7 @@ import os
 
 s = socket.socket(socket.SOCK_DGRAM)  # Create a socket object
 host = socket.gethostname()  # Get local machine name
-port = 60000  # Reserve a port for your service.
+port = 6000  # Reserve a port for your service.
 
 s.connect((host, port))
 # client is connected to the server
@@ -37,7 +37,7 @@ def de_register(s, username, filename):  # function to de-register a file from t
                       'file_name': filename})  # create T type PDU convert it to binary and send to index server
     b_t_pdu = pickle.dumps(t_pdu)
     s.send(b_t_pdu)
-    b_conf_pdu = s.recv()  # Receive reply PDU and parse it
+    b_conf_pdu = s.recv(2048)  # Receive reply PDU and parse it
     reply_pdu = pickle.loads(b_conf_pdu)
 
     if reply_pdu.data_type == 'A':
@@ -59,7 +59,7 @@ def download_file(file_name, address, destination):
     # create a 'D' type pdu asking for the file
     ds.send(b_pdu)
     # send pdu to peer address (destination)
-    r_b_pdu = ds.recv()
+    r_b_pdu = ds.recv(2048)
     r_pdu = pickle.loads(r_b_pdu)
     data_type = r_pdu.data_type
     if data_type == 'E':
@@ -102,21 +102,22 @@ ss.listen(5)
 inputs.append(ss)
 exp.append(ss)
 
-timeout = 1  # timeout for the select function, it's 1 second now, you can have fraction of a second using float
+timeout = 1   # timeout for the select function, it's 1 second now, you can have fraction of a second using float
 # number, example: timeout = 0.3
 # service loop
 while True:
-    readable, writable, exceptional = select.select(inputs, outputs, exp)
+    readable, writable, exceptional = select.select(inputs, outputs, exp, timeout)
     for sock in readable:  # check the incoming connection requests
         if sock is ss:
             fileReq_Socket, fileReq_addr = ss.accept()  # accept connection
-            ss.recv()  # receive the request
-            data = s.recv(100)
+            ss.recv(2048)  # receive the request
+            data = s.recv(2048)
             new = pickle.loads(data)  # change it to namedtuple
             type = new.data_type  # extract data_type
             print(type)
             data = new.data  # extract data
             print(data)
+
             if type == 'D':  # check the file name (it should be 'D' type)
                 c_pdu = PDU('C', {'msg': 'File does not exist'})  # creates E pdu
                 b_c_pdu = pickle.dumps(e_pdu)  # turns pdu into bytes
@@ -140,7 +141,7 @@ while True:
         b_o_pdu = pickle.dumps(o_pdu)
         s.send(b_o_pdu)
 
-        reply_pdu = s.recv()
+        reply_pdu = s.recv(2048)
         reply = pickle.loads(reply_pdu)
         print(*reply.data, sep='\n')
 
@@ -151,7 +152,7 @@ while True:
         b_s_pdu = pickle.dumps(s_pdu)
         s.send(b_s_pdu)
 
-        reply_pdu = s.recv()  # Get reply PDU for connection and send data to download file function
+        reply_pdu = s.recv(2048)  # Get reply PDU for connection and send data to download file function
         reply = pickle.loads(reply_pdu)
         address = reply.data.get('address')
 
@@ -170,7 +171,7 @@ while True:
         b_r_PDU = pickle.dumps(r_PDU)
         s.send(b_r_PDU)
 
-        b_recv_PDU = s.recv()  # Receive response from index server and parse the PDU
+        b_recv_PDU = s.recv(2048)  # Receive response from index server and parse the PDU
         conf_pdu = pickle.loads(b_recv_PDU)
 
         if conf_pdu.data_type == 'A':  # Ack received  and successful registration
