@@ -39,7 +39,7 @@ while True:
 
     if data_type == 'R':# check data_type
         data = pdu.data #local variable for the data
-        p_peer_name = data.get('peer name') #Local variable for peer name
+        p_peer_name = data.get('peer_name') #Local variable for peer name
         p_file_name = data.get('file_name') #local variable for file name
         p_peer_address = data.get('address') #local variable for address
 
